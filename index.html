@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            padding: 50px;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+            width: 90%;
+            max-width: 400px;
+        }
+        input {
+            padding: 12px;
+            margin: 10px 0;
+            width: 80%;
+            max-width: 300px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            text-align: center;
+        }
+        button {
+            padding: 12px;
+            background: #ff9800;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 85%;
+            max-width: 320px;
+        }
+        button:hover {
+            background: #e68900;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Weather App</h2>
+        <input type="text" id="location" placeholder="Enter location">
+        <button onclick="getWeather()">Get Weather</button>
+        <h3 id="result"></h3>
+    </div>
+    
+    <script>
+        function getWeather() {
+            let location = document.getElementById('location').value;
+            let apiKey = '6ecd3571103e462d892174823250903';
+            let url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerHTML = `
+                        <p>📍 Location: <strong>${data.location.name}, ${data.location.country}</strong></p>
+                        <p>📅 Date: <strong>${data.location.localtime.split(' ')[0]}</strong></p>
+                        <p>⏰ Time: <strong>${data.location.localtime.split(' ')[1]}</strong></p>
+                        <p>🌡️ Temperature: <strong>${data.current.temp_c}°C</strong></p>
+                        <p>⛅ Condition: <strong>${data.current.condition.text}</strong></p>
+                    `;
+                })
+                .catch(error => {
+                    document.getElementById('result').innerText = 'Error fetching weather data';
+                });
+        }
+    </script>
+</body>
+</html>
