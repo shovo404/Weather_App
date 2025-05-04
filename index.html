@@ -4,60 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weather App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background: linear-gradient(to right, #4facfe, #00f2fe);
-            padding: 50px;
-            color: white;
+        .weather-bg {
+            transition: background 1s ease;
         }
-        .container {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            display: inline-block;
-            width: 90%;
-            max-width: 400px;
+        .sunny {
+            background: linear-gradient(135deg, #facc15 0%, #f97316 100%);
         }
-        input {
-            padding: 12px;
-            margin: 10px 0;
-            width: 80%;
-            max-width: 300px;
-            border: none;
-            border-radius: 5px;
-            outline: none;
-            text-align: center;
+        .cloudy {
+            background: linear-gradient(135deg, #94a3b8 0%, #475569 100%);
         }
-        button {
-            padding: 12px;
-            background: #ff9800;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            width: 85%;
-            max-width: 320px;
+        .rainy {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
         }
-        button:hover {
-            background: #e68900;
+        .default {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
-        #result {
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
+        .btn-hover {
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        .btn-hover:hover {
+            transform: scale(1.05);
+            background-color: #e68900;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h2>Weather App</h2>
-        <input type="text" id="location" placeholder="Enter location">
-        <button onclick="getWeather()">Get Weather</button>
-        <h3 id="result"></h3>
+<body class="weather-bg default min-h-screen flex items-center justify-center text-white">
+    <div class="container bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-xl w-full max-w-md">
+        <h2 class="text-3xl font-bold text-center mb-6">Weather App</h2>
+        <input 
+            type="text" 
+            id="location" 
+            placeholder="Enter location" 
+            class="w-full p-3 mb-4 bg-white/20 rounded-lg text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-orange-400 text-center"
+        >
+        <button 
+            onclick="getWeather()" 
+            class="w-full p-3 bg-orange-500 text-white rounded-lg font-semibold btn-hover"
+        >
+            Get Weather
+        </button>
+        <div id="result" class="mt-6 text-lg font-medium space-y-2"></div>
     </div>
     
     <script>
@@ -70,16 +58,57 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('result').innerHTML = `
-                        <p>📍 Location: <strong>${data.location.name}, ${data.location.country}</strong></p>
-                        <p>📅 Date: <strong>${data.location.localtime.split(' ')[0]}</strong></p>
-                        <p>⏰ Time: <strong>${data.location.localtime.split(' ')[1]}</strong></p>
-                        <p>🌡️ Temperature: <strong>${data.current.temp_c}°C</strong></p>
-                        <p>⛅ Condition: <strong>${data.current.condition.text}</strong></p>
+                        <p><span class="text-cyan-300">📍 Location:</span> <strong>${data.location.name}, ${data.location.country}</strong></p>
+                        <p><span class="text-cyan-300">📅 Date:</span> <strong>${data.location.localtime.split(' ')[0]}</strong></p>
+                        <p><span class="text-cyan-300">⏰ Time:</span> <strong>${data.location.localtime.split(' ')[1]}</strong></p>
+                        <p><span class="text-cyan-300">🌡️ Temperature:</span> <strong>${data.current.temp_c}°C</strong></p>
+                        <p><span class="text-cyan-300">⛅ Condition:</span> <strong>${data.current.condition.text}</strong></p>
+                        <button 
+                            onclick="resetSearch()" 
+                            class="w-full p-3 mt-4 bg-orange-500 text-white rounded-lg font-semibold btn-hover"
+                        >
+                            Search Another Location
+                        </button>
                     `;
+                    updateBackground(data.current.condition.text);
                 })
                 .catch(error => {
                     document.getElementById('result').innerText = 'Error fetching weather data';
+                    updateBackground('default');
                 });
+        }
+
+        function resetSearch() {
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('location').value = '';
+            document.getElementById('location').focus();
+            updateBackground('default');
+        }
+
+        function updateBackground(condition) {
+            const body = document.body;
+            body.classList.remove('sunny', 'cloudy', 'rainy', 'default');
+            
+            switch(condition.toLowerCase()) {
+                case 'sunny':
+                case 'clear':
+                    body.classList.add('sunny');
+                    break;
+                case 'cloudy':
+                case 'partly cloudy':
+                case 'overcast':
+                    body.classList.add('cloudy');
+                    break;
+                case 'rain':
+                case 'shower':
+                case 'light rain':
+                case 'moderate rain':
+                case 'heavy rain':
+                    body.classList.add('rainy');
+                    break;
+                default:
+                    body.classList.add('default');
+            }
         }
     </script>
 </body>
